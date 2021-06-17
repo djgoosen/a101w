@@ -10,8 +10,8 @@ ansible -i inventory all -a "/bin/echo hello"
 ansible -i inventory web -m command -a "uptime" -o
 ansible -i inventory web -m setup
 echo hello at $(date) > timestamp.txt
-ansible -i inventory all -m copy -a "src=out.txt dest=/tmp/timestamp.txt"
-ansible -i inventory host1 -m file -a "dest=/tmp/out.txt mode=600"
+ansible -i inventory all -m copy -a "src=timestamp.txt dest=/tmp/timestamp.txt"
+ansible -i inventory host1 -m file -a "dest=/tmp/timestamp.txt mode=600"
 ansible -i inventory host1 -m file -a "dest=/tmp/mydir mode=755 owner=ec2-user group=ec2-user state=directory"
 ansible -i inventory host1 -m file -a "dest=/tmp/mydir state=absent"
 ansible -i inventory host1 -m yum -a "name=httpd state=present" -b
