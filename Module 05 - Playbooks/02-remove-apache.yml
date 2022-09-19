@@ -1,0 +1,14 @@
+---
+- name: Remove Apache
+  hosts: web
+  become: true
+  tasks:
+    - name: Ensure apache is NOT running
+      ansible.builtin.service:
+        name: httpd
+        state: stopped
+
+    - name: Ensure apache is absent
+      ansible.builtin.yum:
+        name: httpd
+        state: absent

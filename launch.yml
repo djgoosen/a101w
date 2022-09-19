@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  connection: local
+  name: Launch EC2 instance(s)
+  gather_facts: false
+  # become: true
+  vars_files:
+    - creds.yml
+  vars:
+    date_string: "20211202"
+    key_name: "ansible-workshop-{{ date_string }}"
+    instance_type: t2.micro
+    region: us-west-2
+    image: ami-01e78c5619c5e68b4
+    count: 3
+
+  tasks:
+
+    - name: Launch EC2 instance(s)
+      amazon.aws.ec2:
+        key_name: '{{ key_name }}'
+        instance_type: '{{ instance_type }}'
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        region: '{{ region }}'
+        image: '{{ image }}'
+        wait: yes
+        count: '{{ count }}'
+        instance_tags:
+          workshop_date: "{{ date_string }}"
+      register: result
+
+    - debug:
+        var: result

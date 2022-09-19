@@ -1,0 +1,10 @@
+---
+- name: Iterator demo
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Iterate fib
+      ansible.builtin.command: echo {{ item }}
+      loop: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+      when: item > 7

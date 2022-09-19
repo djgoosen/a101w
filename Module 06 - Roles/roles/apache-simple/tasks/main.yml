@@ -1,0 +1,30 @@
+---
+# tasks file for apache-simple
+- name: Install httpd packages
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ httpd_packages }}"
+  notify: restart apache service
+
+- name: Create site-enabled directory
+  ansible.builtin.file:
+    name: /etc/httpd/conf/sites-enabled
+    state: directory
+
+- name: Copy httpd.conf
+  ansible.builtin.template:
+    src: templates/httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+  notify: restart apache service
+
+- name: Copy index.html
+  ansible.builtin.template:
+    src: templates/index.html.j2
+    dest: /var/www/html/index.html
+
+- name: Start httpd
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: yes

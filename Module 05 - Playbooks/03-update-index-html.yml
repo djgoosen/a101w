@@ -1,0 +1,26 @@
+---
+- name: "Install and Start Apache with Custom index.html"
+  hosts: web
+  vars:
+    my_hostname: "{{ ansible_nodename }}"
+  become: true
+  tasks:
+    - name: Install the latest version of Apache
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+
+    - name: Write the index.html file
+      ansible.builtin.template:
+        src: templates/03-index.html.j2
+        dest: /var/www/html/index.html
+        mode: '0755'
+
+    - name: Ensure apache is running
+      ansible.builtin.service:
+        name: httpd
+        state: started
+
+    - name: Print hostname
+      ansible.builtin.debug:
+        var: my_hostname

@@ -1,0 +1,19 @@
+---
+- hosts: student
+  name: This bootstraps the Ansible 101 workshop environment in EC2
+  gather_facts: false
+  become: true
+
+  roles:
+    - bootstrap
+
+  vars_prompt:
+    - name: "rh_username"
+      prompt: "Enter RH Sub portal username"
+      private: no
+      confirm: no
+
+    - name: "rh_password"
+      prompt: "Enter RH Sub portal password"
+      private: yes
+      confirm: no

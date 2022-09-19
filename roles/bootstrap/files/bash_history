@@ -1,0 +1,82 @@
+echo Hello World!
+cat ~/setup.sh
+source ~/setup.sh
+vim /home/ec2-user/inventory
+HOST1=$(cat /home/ec2-user/inventory | grep host1 | cut -d "=" -f2)
+HOST2=$(cat /home/ec2-user/inventory | grep host2 | cut -d "=" -f2)
+ansible -i inventory all -m ping
+ansible -i inventory web -m ping
+ansible -i inventory all -a "/bin/echo hello"
+ansible -i inventory web -m command -a "uptime" -o
+ansible -i inventory web -m setup
+echo hello at $(date) > timestamp.txt
+ansible -i inventory all -m copy -a "src=timestamp.txt dest=/tmp/timestamp.txt"
+ansible -i inventory host1 -m file -a "dest=/tmp/timestamp.txt mode=600"
+ansible -i inventory host1 -m file -a "dest=/tmp/mydir mode=755 owner=ec2-user group=ec2-user state=directory"
+ansible -i inventory host1 -m file -a "dest=/tmp/mydir state=absent"
+ansible -i inventory host1 -m yum -a "name=httpd state=present" -b
+ansible -i inventory host1 -m service -a "name=httpd state=started" -b
+ansible -i inventory host1 -m command -a "service httpd status" -b
+ansible -i inventory host1 -m service -a "name=httpd state=restarted" -b
+ansible -i inventory host1 -m service -a "name=httpd state=stopped" -b
+ansible -i inventory host1 -m yum -a "name=httpd state=absent" -b
+mkdir -p ~/apache_basic/templates
+cd ~/apache_basic
+vim 01-verify-apache.yml
+ansible-playbook -i ../inventory 01-verify-apache.yml
+cat ../inventory
+ssh $HOST1 curl localhost
+vim 02-remove-apache.yml
+cd templates
+curl -O https://levelupworkshops.s3-us-west-2.amazonaws.com/ansible-workshops/101/03-index.html.j2
+cd ../
+vim 03-update-index-html.yml
+ansible-playbook -i ../inventory 03-update-index-html.yml
+cat ../inventory
+ssh $HOST1 curl localhost
+ansible-lint 03-update-index-html.yml
+cd ~
+mkdir -p ~/apache_basic_playbook/templates
+cd apache_basic_playbook
+vim 04-site.yml
+cd templates
+curl -O https://levelupworkshops.s3-us-west-2.amazonaws.com/ansible-workshops/101/04-httpd.conf.j2
+curl -O https://levelupworkshops.s3-us-west-2.amazonaws.com/ansible-workshops/101/04-index.html.j2
+cd ../
+ansible-lint 04-site.yml
+ansible-playbook -i ../inventory 04-site.yml
+cat ../inventory
+ssh $HOST1 curl localhost
+cd ~/apache_basic_playbook
+cp templates/04-index.html.j2 templates/index.html.j2
+cp templates/04-httpd.conf.j2 templates/httpd.conf.j2
+mkdir roles
+cd roles
+ansible-galaxy init apache-simple
+cd ~/apache_basic_playbook/roles/apache-simple/
+rm -rf tests files
+tree
+cd ~/apache_basic_playbook/
+vim site.yml
+vim roles/apache-simple/defaults/main.yml
+vim roles/apache-simple/handlers/main.yml
+vim roles/apache-simple/tasks/main.yml
+vim roles/apache-simple/vars/main.yml
+ansible-playbook -i ../inventory site.yml
+cat ../inventory
+ssh $HOST1 curl localhost
+cd ~
+vim creds.yml
+echo Pad1ock > ~/.vpass.txt
+ansible-vault encrypt creds.yml
+cat creds.yml
+vim encryptiondemo.yml
+id YOUR_USERNAME
+ansible-playbook -v -i localhost -c local encryptiondemo.yml --vault-password-file ~/.vpass.txt
+id YOUR_USERNAME
+cd ~
+ansible-playbook -i inventory apache_basic/02-remove-apache.yml --check --diff --limit host1
+ssh $HOST1 curl localhost
+cd ~/apache_basic_playbook
+vim 04-site.yml
+ansible-playbook -i ../inventory 04-site.yml

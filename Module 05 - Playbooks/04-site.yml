@@ -1,0 +1,51 @@
+---
+- name: Install and Configure Full Apache Website
+  hosts: web
+#  serial: 1
+  become: true
+  vars:
+    httpd_packages:
+      - httpd
+      - httpd-devel
+    apache_test_message: This is a test message for the Ansible 101 workshop
+    apache_max_keep_alive_requests: 115
+    apache_webserver_port: 80
+
+  tasks:
+    - name: Install httpd packages
+      ansible.builtin.yum:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ httpd_packages }}"
+      notify: restart web
+
+    - name: Create site-enabled directory
+      ansible.builtin.file:
+        name: /etc/httpd/conf/sites-enabled
+        state: directory
+
+    - name: Copy httpd.conf
+      ansible.builtin.template:
+        src: templates/04-httpd.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+      notify: restart web
+
+    - name: Copy index.html
+      ansible.builtin.template:
+        src: templates/04-index.html.j2
+        dest: /var/www/html/index.html
+        mode: '0755'
+
+    - name: Start httpd
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart apache service
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+        enabled: yes
+      listen: restart web

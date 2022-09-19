@@ -1,0 +1,8 @@
+---
+# handlers file for apache-simple
+- name: Restart apache service
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+    enabled: yes
+  listen: restart web

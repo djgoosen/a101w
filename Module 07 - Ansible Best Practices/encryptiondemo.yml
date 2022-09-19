@@ -1,0 +1,20 @@
+---
+- name: Encryption demo
+  hosts: localhost
+  gather_facts: false
+  become: true
+  vars_files:
+    - creds.yml
+
+  tasks:
+    - name: "Ensure group {{ user }} group exists"
+      ansible.builtin.group:
+        name: '{{ user }}'
+        state: present
+
+    - name: "Ensure user {{ user }} exists"
+      ansible.builtin.user:
+        name: '{{ user }}'
+        group: '{{ user }}'
+        password: "{{ passwd | password_hash('sha512') }}"
+      no_log: true

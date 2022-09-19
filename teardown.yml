@@ -1,0 +1,11 @@
+---
+- hosts: student
+  name: This tears down the Ansible 101 workshop environment in EC2
+  gather_facts: false
+  become: true
+
+# terminate EC2 instances
+
+# delete workshop key pairs
+
+

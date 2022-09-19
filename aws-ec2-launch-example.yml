@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  connection: local
+  name: AWS EC2 Launch Example
+  gather_facts: false
+  vars_files:
+    - creds.yml
+  vars:
+    key_name: test-key-011221
+    instance_type: t2.micro
+    region: us-west-2
+    image: ami-0841edc20334f9287
+    count: 2
+
+  tasks:
+
+    - name: launch EC2 instance(s)
+      amazon.aws.ec2:
+        key_name: '{{ key_name }}'
+        instance_type: '{{ instance_type }}'
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        region: '{{ region }}'
+        image: '{{ image }}'
+        wait: yes
+        count: '{{ count }}'
+      register: result
+
+    - debug:
+        var: result
+

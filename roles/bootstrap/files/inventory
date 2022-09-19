@@ -1,0 +1,3 @@
+[web]
+host1 ansible_host=XX.XX.XX.XX
+host2 ansible_host=ZZ.ZZ.ZZ.ZZ

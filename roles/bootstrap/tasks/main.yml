@@ -1,0 +1,101 @@
+---
+# tasks file for bootstrap
+
+- name: Red Hat register and auto-subscribe to available content
+  redhat_subscription:
+    state: present
+    username: "{{ rh_username }}"
+    password: "{{ rh_password }}"
+    auto_attach: true
+  tags:
+    - red_hat
+
+- name: copy ssh config file
+  copy:
+    src: files/ssh_config
+    dest: /home/ec2-user/.ssh/config
+    owner: ec2-user
+    group: ec2-user
+    mode: 0600
+  tags:
+    - ssh_setup
+
+- name: copy local ssh key agent setup file
+  copy:
+    src: files/ffwd.sh
+    dest: /home/ec2-user/ffwd.sh
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+  tags:
+    - ssh_setup
+
+- name: copy local ssh key file
+  copy:
+    src: files/mykey.pem
+    dest: /home/ec2-user/.ssh/mykey.pem
+    owner: ec2-user
+    group: ec2-user
+    mode: 0600
+  tags:
+    - ssh_setup
+
+- name: copy setup.sh file
+  copy:
+    src: files/setup.sh
+    dest: /home/ec2-user/setup.sh
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+  tags:
+    - ansible_setup
+
+- name: copy motd file
+  copy:
+    src: files/motd
+    dest: /etc/motd
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+
+- name: copy bash_history file
+  copy:
+    src: files/bash_history
+    dest: /home/ec2-user/.bash_history
+    owner: ec2-user
+    group: ec2-user
+    mode: 0664
+
+- name: install packages
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - "@Development tools"
+    - tree
+    - gcc
+    - gcc-c++
+    - kernel-devel
+    - openssl-devel
+    - bzip2-devel
+    - libffi-devel
+    - wget
+    - vim
+    - nano
+
+- name: copy inventory file
+  copy:
+    src: files/inventory
+    dest: /home/ec2-user/inventory
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+  tags:
+    - ansible_setup
+
+- name: install Python3
+  script: files/pre-setup.sh
+  args:
+    creates: /home/ec2-user/bootstrapped.txt
+  tags:
+    - ansible_setup

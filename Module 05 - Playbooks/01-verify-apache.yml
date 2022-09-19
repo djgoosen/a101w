@@ -1,0 +1,13 @@
+---
+- name: Install and Start Apache
+  hosts: web
+  become: true
+  tasks:
+    - name: Ensure apache is at the latest version
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+    - name: Ensure apache is running
+      ansible.builtin.service:
+        name: httpd
+        state: started
